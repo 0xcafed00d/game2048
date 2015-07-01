@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/nsf/termbox-go"
 	"github.com/simulatedsimian/rect"
+	"time"
 )
 
 func main() {
@@ -11,6 +12,13 @@ func main() {
 		panic(err)
 	}
 	defer termbox.Close()
+
+	eventQueue := make(chan termbox.Event)
+	go func() {
+		for {
+			eventQueue <- termbox.PollEvent()
+		}
+	}()
 
 	tbuffer := TermboxBuffer{}
 
@@ -27,19 +35,38 @@ func main() {
 
 	doQuit := false
 
+	ticker := time.NewTicker(time.Millisecond * 10)
+
+	x, y := 0, 0
+	dx, dy := 1, 1
+
 	for !doQuit {
-		ev := termbox.PollEvent()
-
-		if ev.Type == termbox.EventKey {
-			if ev.Ch == 'q' {
-				doQuit = true
+		select {
+		case ev := <-eventQueue:
+			if ev.Type == termbox.EventKey {
+				if ev.Ch == 'q' {
+					doQuit = true
+				}
+				termbox.Flush()
 			}
-			termbox.Flush()
-		}
 
-		if ev.Type == termbox.EventResize {
+			if ev.Type == termbox.EventResize {
+				termbox.Flush()
+			}
+
+		case <-ticker.C:
+			FillArea(tbuffer, r, 'x', (uint16)(termbox.ColorCyan), (uint16)(termbox.ColorGreen), ALL)
+			BlitBuffer(b, tbuffer, x, y)
 			termbox.Flush()
+			x += dx
+			y += dy
+
+			if x > 60 || x <= 0 {
+				dx = -dx
+			}
+			if y > 30 || y <= 0 {
+				dy = -dy
+			}
 		}
 	}
-
 }
