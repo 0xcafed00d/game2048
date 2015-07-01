@@ -1,6 +1,7 @@
 package main
 
 import (
+	//	"fmt"
 	"github.com/nsf/termbox-go"
 	"github.com/simulatedsimian/rect"
 )
@@ -14,18 +15,18 @@ type Buffer interface {
 type TermboxBuffer struct {
 }
 
-func (b *TermboxBuffer) SetCell(x, y int, ch rune, fg, bg uint16) {
+func (b TermboxBuffer) SetCell(x, y int, ch rune, fg, bg uint16) {
 	termbox.SetCell(x, y, ch, termbox.Attribute(fg), termbox.Attribute(bg))
 }
 
-func (b *TermboxBuffer) GetCell(x, y int) (rune, uint16, uint16) {
+func (b TermboxBuffer) GetCell(x, y int) (rune, uint16, uint16) {
 	cells := termbox.CellBuffer()
 	w, _ := termbox.Size()
 	var cell *termbox.Cell = &cells[y*w+x]
 	return cell.Ch, uint16(cell.Fg), uint16(cell.Bg)
 }
 
-func (b *TermboxBuffer) Size() (int, int) {
+func (b TermboxBuffer) Size() (int, int) {
 	return termbox.Size()
 }
 
@@ -74,7 +75,8 @@ const (
 
 func FillArea(dst Buffer, area rect.Rectangle, ch rune, fg, bg uint16, filltype int) {
 	area, ok := rect.Intersection(rect.WH(dst.Size()), area)
-	if !ok {
+
+	if ok {
 		for x := area.Min.X; x < area.Max.X; x++ {
 			for y := area.Min.Y; y < area.Max.Y; y++ {
 				if filltype == ALL {
@@ -110,7 +112,8 @@ func BlitBuffer(src, dst Buffer, xpos, ypos int) {
 	if intersect, ok := rect.Intersection(srcSz, dstSz); ok {
 		for y := intersect.Min.Y; y < intersect.Max.Y; y++ {
 			for x := intersect.Min.X; x < intersect.Max.X; x++ {
-				cpfunc(dest[coord(x, y)], source[coord(x-pos.x, y-pos.y)])
+				nch, nfg, nbg := src.GetCell(x-xpos, y-ypos)
+				dst.SetCell(x, y, nch, nfg, nbg)
 			}
 		}
 	}
