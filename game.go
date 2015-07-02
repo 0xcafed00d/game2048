@@ -24,10 +24,10 @@ func main() {
 
 	r := rect.WH(tbuffer.Size())
 	r.Expand(rect.Vec{-1, -1})
-	FillArea(tbuffer, r, 'x', (uint16)(termbox.ColorCyan), (uint16)(termbox.ColorGreen), CHAR)
+	FillArea(tbuffer, r, 'x', termbox.ColorCyan, termbox.ColorGreen, CHAR)
 
 	b := MakeMemBuffer(10, 10)
-	Fill(b, '0', (uint16)(termbox.ColorRed), (uint16)(termbox.ColorBlue), ALL)
+	Fill(b, '0', termbox.ColorRed, termbox.ColorBlue, ALL)
 
 	BlitBuffer(b, tbuffer, 1, 1)
 
@@ -55,7 +55,7 @@ func main() {
 			}
 
 		case <-ticker.C:
-			FillArea(tbuffer, r, 'x', (uint16)(termbox.ColorCyan), (uint16)(termbox.ColorGreen), ALL)
+			FillArea(tbuffer, r, 'x', termbox.ColorCyan, termbox.ColorGreen, ALL)
 			BlitBuffer(b, tbuffer, x, y)
 			termbox.Flush()
 			x += dx

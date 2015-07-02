@@ -6,46 +6,47 @@ import (
 	"github.com/simulatedsimian/rect"
 )
 
+func printAt(b Buffer, x, y int, s string, fg, bg termbox.Attribute) {
+	for _, r := range s {
+		b.SetCell(x, y, r, fg, bg)
+		x++
+	}
+}
+
 type Buffer interface {
-	SetCell(x, y int, ch rune, fg, bg uint16)
-	GetCell(x, y int) (rune, uint16, uint16)
+	SetCell(x, y int, ch rune, fg, bg termbox.Attribute)
+	GetCell(x, y int) (rune, termbox.Attribute, termbox.Attribute)
 	Size() (int, int)
 }
 
 type TermboxBuffer struct {
 }
 
-func (b TermboxBuffer) SetCell(x, y int, ch rune, fg, bg uint16) {
-	termbox.SetCell(x, y, ch, termbox.Attribute(fg), termbox.Attribute(bg))
+func (b TermboxBuffer) SetCell(x, y int, ch rune, fg, bg termbox.Attribute) {
+	termbox.SetCell(x, y, ch, fg, bg)
 }
 
-func (b TermboxBuffer) GetCell(x, y int) (rune, uint16, uint16) {
+func (b TermboxBuffer) GetCell(x, y int) (rune, termbox.Attribute, termbox.Attribute) {
 	cells := termbox.CellBuffer()
 	w, _ := termbox.Size()
-	var cell *termbox.Cell = &cells[y*w+x]
-	return cell.Ch, uint16(cell.Fg), uint16(cell.Bg)
+	cell := &cells[y*w+x]
+	return cell.Ch, cell.Fg, cell.Bg
 }
 
 func (b TermboxBuffer) Size() (int, int) {
 	return termbox.Size()
 }
 
-type Cell struct {
-	Ch rune
-	Fg uint16
-	Bg uint16
-}
-
 type MemBuffer struct {
 	w, h  int
-	cells []Cell
+	cells []termbox.Cell
 }
 
 func MakeMemBuffer(w, h int) *MemBuffer {
-	return &MemBuffer{w, h, make([]Cell, w*h)}
+	return &MemBuffer{w, h, make([]termbox.Cell, w*h)}
 }
 
-func (b *MemBuffer) SetCell(x, y int, ch rune, fg, bg uint16) {
+func (b *MemBuffer) SetCell(x, y int, ch rune, fg, bg termbox.Attribute) {
 	if x < 0 || x >= b.w {
 		return
 	}
@@ -53,10 +54,10 @@ func (b *MemBuffer) SetCell(x, y int, ch rune, fg, bg uint16) {
 		return
 	}
 
-	b.cells[y*b.w+x] = Cell{ch, fg, bg}
+	b.cells[y*b.w+x] = termbox.Cell{ch, fg, bg}
 }
 
-func (b *MemBuffer) GetCell(x, y int) (rune, uint16, uint16) {
+func (b *MemBuffer) GetCell(x, y int) (rune, termbox.Attribute, termbox.Attribute) {
 	cell := &b.cells[y*b.w+x]
 	return cell.Ch, cell.Fg, cell.Bg
 }
@@ -73,7 +74,7 @@ const (
 	ATTRIBS = FG | BG
 )
 
-func FillArea(dst Buffer, area rect.Rectangle, ch rune, fg, bg uint16, filltype int) {
+func FillArea(dst Buffer, area rect.Rectangle, ch rune, fg, bg termbox.Attribute, filltype int) {
 	area, ok := rect.Intersection(rect.WH(dst.Size()), area)
 
 	if ok {
@@ -99,7 +100,7 @@ func FillArea(dst Buffer, area rect.Rectangle, ch rune, fg, bg uint16, filltype 
 	}
 }
 
-func Fill(dst Buffer, ch rune, fg, bg uint16, filltype int) {
+func Fill(dst Buffer, ch rune, fg, bg termbox.Attribute, filltype int) {
 	FillArea(dst, rect.WH(dst.Size()), ch, fg, bg, filltype)
 }
 
