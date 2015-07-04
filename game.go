@@ -7,6 +7,19 @@ import (
 )
 
 func main() {
+	gc := GameCore{}
+
+	gc.OnInit = nil
+	gc.OnEvent = nil
+	gc.OnTick = nil
+
+	err := gc.Start()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func mainx() {
 	err := termbox.Init()
 	if err != nil {
 		panic(err)

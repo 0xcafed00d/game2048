@@ -1,7 +1,7 @@
 package main
 
 import (
-	//	"fmt"
+	//"fmt"
 	"github.com/nsf/termbox-go"
 	"github.com/simulatedsimian/rect"
 )
@@ -53,7 +53,6 @@ func (b *MemBuffer) SetCell(x, y int, ch rune, fg, bg termbox.Attribute) {
 	if y < 0 || y >= b.h {
 		return
 	}
-
 	b.cells[y*b.w+x] = termbox.Cell{ch, fg, bg}
 }
 
