@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/nsf/termbox-go"
 	"time"
+
+	"github.com/nsf/termbox-go"
 )
 
 type OnInitFunc func(gc *GameCore) error
