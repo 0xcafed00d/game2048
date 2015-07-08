@@ -6,23 +6,23 @@ import (
 
 type StateFunc func(sm *StateMachine)
 
-type StateInfo struct {
+type State struct {
 	Enter  StateFunc
 	Action StateFunc
 	Exit   StateFunc
 }
 
 type StateMachine struct {
-	states       map[int]*StateInfo
-	currentState *StateInfo
-	gosubStack   []*StateInfo
+	states       map[int]*State
+	currentState *State
+	gosubStack   []*State
 }
 
 func MakeStateMachine() StateMachine {
-	return StateMachine{states: make(map[int]*StateInfo)}
+	return StateMachine{states: make(map[int]*State)}
 }
 
-func (sm *StateMachine) AddState(id int, si StateInfo) {
+func (sm *StateMachine) AddState(id int, si State) {
 	sm.states[id] = &si
 }
 
@@ -66,7 +66,7 @@ func (sm *StateMachine) Gosub(id int) {
 	}
 }
 
-func (sm *StateMachine) Return(id int) {
+func (sm *StateMachine) Return() {
 	if len(sm.gosubStack) > 0 {
 		if sm.currentState.Exit != nil {
 			sm.currentState.Exit(sm)
