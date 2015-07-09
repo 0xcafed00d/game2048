@@ -1,11 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"github.com/nsf/termbox-go"
 	"github.com/simulatedsimian/rect"
 )
 
 func main() {
+
+	js, jerr := OpenJoystick("/dev/input/js0")
+	if jerr != nil {
+		panic(jerr)
+	}
+
+	for {
+		ev, err := js.GetEvent()
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("%v\n", ev)
+	}
+
 	gc := GameCore{}
 
 	var r rect.Rectangle
