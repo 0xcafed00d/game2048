@@ -19,7 +19,7 @@ func main() {
 			panic(err)
 		}
 
-		fmt.Printf("%v\n", ev)
+		fmt.Printf("%v\n", &ev)
 	}
 
 	gc := GameCore{}
