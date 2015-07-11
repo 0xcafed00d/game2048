@@ -10,10 +10,10 @@ func main() {
 
 	js, jerr := OpenJoystick("/dev/input/js0")
 
-	fmt.Println("Axis Count: ", js.AxisCount)
-	fmt.Println("Button Count: ", js.ButtonCount)
-	fmt.Println("Name: ", js.Name)
 	if jerr == nil {
+		fmt.Println("Axis Count: ", js.AxisCount)
+		fmt.Println("Button Count: ", js.ButtonCount)
+		fmt.Println("Name: ", js.Name)
 
 		for {
 			ev, err := js.GetEvent()

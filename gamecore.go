@@ -19,7 +19,7 @@ type GameCore struct {
 	BackBuffer TermboxBuffer
 }
 
-func (gc *GameCore) Start() error {
+func (gc *GameCore) Run() error {
 	err := termbox.Init()
 	if err != nil {
 		return err
