@@ -9,19 +9,21 @@ import (
 func main() {
 
 	js, jerr := OpenJoystick("/dev/input/js0")
-	if jerr != nil {
-		panic(jerr)
-	}
 
-	for {
-		ev, err := js.GetEvent()
-		if err != nil {
-			panic(err)
+	fmt.Println("Axis Count: ", js.AxisCount)
+	fmt.Println("Button Count: ", js.ButtonCount)
+	fmt.Println("Name: ", js.Name)
+	if jerr == nil {
+
+		for {
+			ev, err := js.GetEvent()
+			if err != nil {
+				panic(err)
+			}
+
+			fmt.Printf("%v\n", &ev)
 		}
-
-		fmt.Printf("%v\n", &ev)
 	}
-
 	gc := GameCore{}
 
 	var r rect.Rectangle

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"unsafe"
 )
 
 const (
@@ -21,8 +22,19 @@ const (
 	JS_AXIS_Y1 uint8 = 3
 )
 
+var (
+	JSIOCGAXES    = _IOR('j', 0x11, 1)  /* get number of axes */
+	JSIOCGBUTTONS = _IOR('j', 0x12, 1)  /* get number of buttons */
+	JSIOCGNAME    = func(len int) int { /* get identifier string */
+		return _IOR('j', 0x13, len)
+	}
+)
+
 type Joystick struct {
-	file *os.File
+	file        *os.File
+	AxisCount   int
+	ButtonCount int
+	Name        string
 }
 
 type JSEvent struct {
@@ -68,7 +80,26 @@ func OpenJoystick(name string) (*Joystick, error) {
 		return nil, err
 	}
 
-	return &Joystick{f}, nil
+	var axisCount uint8 = 0
+	var buttCount uint8 = 0
+	var buffer [256]byte
+
+	ioerr := Ioctl(f, JSIOCGAXES, unsafe.Pointer(&axisCount))
+	if ioerr != 0 {
+		panic(ioerr)
+	}
+
+	ioerr = Ioctl(f, JSIOCGBUTTONS, unsafe.Pointer(&buttCount))
+	if ioerr != 0 {
+		panic(ioerr)
+	}
+
+	ioerr = Ioctl(f, JSIOCGNAME(len(buffer)-1), unsafe.Pointer(&buffer))
+	if ioerr != 0 {
+		panic(ioerr)
+	}
+
+	return &Joystick{f, int(axisCount), int(buttCount), string(buffer[:])}, nil
 }
 
 func (j *Joystick) Close() error {
@@ -89,23 +120,9 @@ func (j *Joystick) GetEvent() (JSEvent, error) {
 	}
 
 	data := bytes.NewReader(b)
-
-	err = binary.Read(data, binary.LittleEndian, &event.Time)
+	err = binary.Read(data, binary.LittleEndian, &event)
 	if err != nil {
 		return JSEvent{}, err
 	}
-	err = binary.Read(data, binary.LittleEndian, &event.Value)
-	if err != nil {
-		return JSEvent{}, err
-	}
-	err = binary.Read(data, binary.LittleEndian, &event.Type)
-	if err != nil {
-		return JSEvent{}, err
-	}
-	err = binary.Read(data, binary.LittleEndian, &event.Number)
-	if err != nil {
-		return JSEvent{}, err
-	}
-
 	return event, nil
 }
