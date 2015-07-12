@@ -8,22 +8,38 @@ import (
 
 func main() {
 
-	js, jerr := OpenJoystick("/dev/input/js0")
+	fmt.Println("Caps: ", GetJoyCaps(0))
 
-	if jerr == nil {
-		fmt.Println("Axis Count: ", js.AxisCount)
-		fmt.Println("Button Count: ", js.ButtonCount)
-		fmt.Println("Name: ", js.Name)
-
-		for {
-			ev, err := js.GetEvent()
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Printf("%v\n", &ev)
-		}
+	for {
+		fmt.Println("Read: ", GetJoyPosEx(0))
 	}
+
+	OpenJoystick(0)
+}
+
+func mainx() {
+
+	OpenJoystick(0)
+
+	/*
+		js, jerr := OpenJoystick("/dev/input/js0")
+
+		if jerr == nil {
+			fmt.Println("Axis Count: ", js.AxisCount)
+			fmt.Println("Button Count: ", js.ButtonCount)
+			fmt.Println("Name: ", js.Name)
+
+			for {
+				ev, err := js.GetEvent()
+				if err != nil {
+					panic(err)
+				}
+
+				fmt.Printf("%v\n", &ev)
+			}
+		}
+	*/
+
 	gc := GameCore{}
 
 	var r rect.Rectangle
@@ -63,7 +79,7 @@ func main() {
 		return nil
 	}
 
-	err := gc.Start()
+	err := gc.Run()
 	if err != nil {
 		panic(err)
 	}
