@@ -3,6 +3,7 @@
 package main
 
 import (
+	"golang.org/x/sys/unix"
 	"os"
 	"syscall"
 	"unsafe"
@@ -42,6 +43,6 @@ func _IOW(t int, nr int, size int) int {
 }
 
 func Ioctl(f *os.File, req int, ptr unsafe.Pointer) syscall.Errno {
-	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, uintptr(f.Fd()), uintptr(req), uintptr(ptr))
+	_, _, err := unix.Syscall(unix.SYS_IOCTL, uintptr(f.Fd()), uintptr(req), uintptr(ptr))
 	return err
 }

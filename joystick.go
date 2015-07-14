@@ -1,7 +1,7 @@
 package main
 
 const (
-	MaxAxisCount   = 6
+	MaxAxisCount   = 8
 	MaxButtonCount = 32
 )
 

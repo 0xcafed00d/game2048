@@ -4,41 +4,24 @@ import (
 	"fmt"
 	"github.com/nsf/termbox-go"
 	"github.com/simulatedsimian/rect"
+	"time"
 )
 
 func main() {
 
-	fmt.Println("Caps: ", GetJoyCaps(0))
+	js, jserr := OpenJoystick(0)
 
-	for {
-		fmt.Println("Read: ", GetJoyPosEx(0))
-	}
+	if jserr == nil {
+		fmt.Println("Axis Count: ", js.AxisCount())
+		fmt.Println("Button Count: ", js.ButtonCount())
+		fmt.Println("Name: ", js.Name())
 
-	OpenJoystick(0)
-}
-
-func mainx() {
-
-	OpenJoystick(0)
-
-	/*
-		js, jerr := OpenJoystick("/dev/input/js0")
-
-		if jerr == nil {
-			fmt.Println("Axis Count: ", js.AxisCount)
-			fmt.Println("Button Count: ", js.ButtonCount)
-			fmt.Println("Name: ", js.Name)
-
-			for {
-				ev, err := js.GetEvent()
-				if err != nil {
-					panic(err)
-				}
-
-				fmt.Printf("%v\n", &ev)
-			}
+		for {
+			jinfo := js.Read()
+			fmt.Printf("%v\n", jinfo)
+			time.Sleep(time.Millisecond * 500)
 		}
-	*/
+	}
 
 	gc := GameCore{}
 

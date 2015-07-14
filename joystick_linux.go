@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 	"unsafe"
 )
 
@@ -30,11 +31,101 @@ var (
 	}
 )
 
-type Joystick struct {
+type JoystickImpl struct {
 	file        *os.File
-	AxisCount   int
-	ButtonCount int
-	Name        string
+	axisCount   int
+	buttonCount int
+	name        string
+	state       JoystickInfo
+	mutex       sync.RWMutex
+}
+
+func OpenJoystick(id int) (Joystick, error) {
+	f, err := os.OpenFile(fmt.Sprintf("/dev/input/js%d", id), os.O_RDONLY, 0666)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var axisCount uint8 = 0
+	var buttCount uint8 = 0
+	var buffer [256]byte
+
+	ioerr := Ioctl(f, JSIOCGAXES, unsafe.Pointer(&axisCount))
+	if ioerr != 0 {
+		panic(ioerr)
+	}
+
+	ioerr = Ioctl(f, JSIOCGBUTTONS, unsafe.Pointer(&buttCount))
+	if ioerr != 0 {
+		panic(ioerr)
+	}
+
+	ioerr = Ioctl(f, JSIOCGNAME(len(buffer)-1), unsafe.Pointer(&buffer))
+	if ioerr != 0 {
+		panic(ioerr)
+	}
+
+	js := &JoystickImpl{}
+	js.axisCount = int(axisCount)
+	js.buttonCount = int(buttCount)
+	js.file = f
+	js.name = string(buffer[:])
+
+	go updateStateFunc(js)
+
+	return js, nil
+}
+
+func updateStateFunc(js *JoystickImpl) {
+	var err error
+	var ev JSEvent
+
+	for err == nil {
+		ev, err = js.getEvent()
+		ev.Type = ev.Type &^ JS_EVENT_INIT
+
+		if ev.Type == JS_EVENT_BUTTON {
+			js.mutex.Lock()
+			if ev.Value == 0 {
+				js.state.Buttons = js.state.Buttons &^ (1 << uint(ev.Number))
+			} else {
+				js.state.Buttons |= 1 << ev.Number
+			}
+
+			js.mutex.Unlock()
+		}
+
+		if ev.Type == JS_EVENT_AXIS {
+			js.mutex.Lock()
+			js.state.AxisData[ev.Number] = int(ev.Value)
+			js.mutex.Unlock()
+		}
+
+	}
+}
+
+func (js *JoystickImpl) AxisCount() int {
+	return js.axisCount
+}
+
+func (js *JoystickImpl) ButtonCount() int {
+	return js.buttonCount
+}
+
+func (js *JoystickImpl) Name() string {
+	return js.name
+}
+
+func (js *JoystickImpl) Read() JoystickInfo {
+	js.mutex.RLock()
+	state := js.state
+	js.mutex.RUnlock()
+	return state
+}
+
+func (js *JoystickImpl) Close() {
+	js.file.Close()
 }
 
 type JSEvent struct {
@@ -73,40 +164,7 @@ func (j *JSEvent) String() string {
 	return fmt.Sprintf("[Time: %v, Type: %v, Number: %v, Value: %v]", j.Time, Type, Number, j.Value)
 }
 
-func OpenJoystick(name string) (*Joystick, error) {
-	f, err := os.OpenFile(name, os.O_RDONLY, 0666)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var axisCount uint8 = 0
-	var buttCount uint8 = 0
-	var buffer [256]byte
-
-	ioerr := Ioctl(f, JSIOCGAXES, unsafe.Pointer(&axisCount))
-	if ioerr != 0 {
-		panic(ioerr)
-	}
-
-	ioerr = Ioctl(f, JSIOCGBUTTONS, unsafe.Pointer(&buttCount))
-	if ioerr != 0 {
-		panic(ioerr)
-	}
-
-	ioerr = Ioctl(f, JSIOCGNAME(len(buffer)-1), unsafe.Pointer(&buffer))
-	if ioerr != 0 {
-		panic(ioerr)
-	}
-
-	return &Joystick{f, int(axisCount), int(buttCount), string(buffer[:])}, nil
-}
-
-func (j *Joystick) Close() error {
-	return j.file.Close()
-}
-
-func (j *Joystick) GetEvent() (JSEvent, error) {
+func (j *JoystickImpl) getEvent() (JSEvent, error) {
 	var event JSEvent
 
 	if j.file == nil {
