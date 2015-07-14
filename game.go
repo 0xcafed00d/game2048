@@ -19,7 +19,7 @@ func main() {
 		for {
 			jinfo := js.Read()
 			fmt.Printf("%v\n", jinfo)
-			time.Sleep(time.Millisecond * 500)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}
 

@@ -83,20 +83,18 @@ func updateStateFunc(js *JoystickImpl) {
 
 	for err == nil {
 		ev, err = js.getEvent()
-		ev.Type = ev.Type &^ JS_EVENT_INIT
 
-		if ev.Type == JS_EVENT_BUTTON {
+		if ev.Type&JS_EVENT_BUTTON != 0 {
 			js.mutex.Lock()
 			if ev.Value == 0 {
-				js.state.Buttons = js.state.Buttons &^ (1 << uint(ev.Number))
+				js.state.Buttons &= ^(1 << uint(ev.Number))
 			} else {
 				js.state.Buttons |= 1 << ev.Number
 			}
-
 			js.mutex.Unlock()
 		}
 
-		if ev.Type == JS_EVENT_AXIS {
+		if ev.Type&JS_EVENT_AXIS != 0 {
 			js.mutex.Lock()
 			js.state.AxisData[ev.Number] = int(ev.Value)
 			js.mutex.Unlock()
