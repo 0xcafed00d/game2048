@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"golang.org/x/sys/windows"
 	"unsafe"
 )
@@ -75,14 +76,6 @@ var (
 	joyGetDevCaps = winmmdll.MustFindProc("joyGetDevCapsW")
 )
 
-func GetJoyCaps(id int) JOYCAPS {
-	var caps JOYCAPS
-	ret, _, _ := joyGetDevCaps.Call(uintptr(id), uintptr(unsafe.Pointer(&caps)), unsafe.Sizeof(caps))
-	ret = ret
-
-	return caps
-}
-
 func GetJoyPosEx(id int) JOYINFOEX {
 	var info JOYINFOEX
 	info.dwSize = uint32(unsafe.Sizeof(info))
@@ -94,7 +87,57 @@ func GetJoyPosEx(id int) JOYINFOEX {
 	return info
 }
 
-func OpenJoystick(id int) error {
+type JoystickImpl struct {
+	id          int
+	axisCount   int
+	buttonCount int
+	name        string
+	state       JoystickInfo
+}
+
+func OpenJoystick(id int) (Joystick, error) {
+
+	js := &JoystickImpl{}
+	js.id = id
+
+	err := js.getJoyCaps()
+	if err == nil {
+		return js, nil
+	}
+	return nil, err
+}
+
+func (js *JoystickImpl) getJoyCaps() error {
+	var caps JOYCAPS
+	ret, _, _ := joyGetDevCaps.Call(uintptr(js.id), uintptr(unsafe.Pointer(&caps)), unsafe.Sizeof(caps))
+	fmt.Printf(">>>%x<<<<", ret)
+
+	if ret != 0 {
+		return fmt.Errorf("Failed to read Joystick %d", js.id)
+	}
+
+	js.axisCount = int(caps.wNumAxes)
+	js.buttonCount = int(caps.wNumButtons)
 
 	return nil
+}
+
+func (js *JoystickImpl) AxisCount() int {
+	return js.axisCount
+}
+
+func (js *JoystickImpl) ButtonCount() int {
+	return js.buttonCount
+}
+
+func (js *JoystickImpl) Name() string {
+	return js.name
+}
+
+func (js *JoystickImpl) Read() JoystickInfo {
+	return js.state
+}
+
+func (js *JoystickImpl) Close() {
+	// no impl under windows
 }

@@ -21,6 +21,8 @@ func main() {
 			fmt.Printf("%v\n", jinfo)
 			time.Sleep(time.Millisecond * 100)
 		}
+	} else {
+		fmt.Println(jserr)
 	}
 
 	gc := GameCore{}
