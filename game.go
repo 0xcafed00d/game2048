@@ -23,6 +23,7 @@ func main() {
 		}
 	} else {
 		fmt.Println(jserr)
+		return
 	}
 
 	gc := GameCore{}

@@ -57,12 +57,7 @@ type JOYCAPS struct {
 type JOYINFOEX struct {
 	dwSize         uint32
 	dwFlags        uint32
-	dwXpos         uint32
-	dwYpos         uint32
-	dwZpos         uint32
-	dwRpos         uint32
-	dwUpos         uint32
-	dwVpos         uint32
+	dwAxis         [6]uint32
 	dwButtons      uint32
 	dwButtonNumber uint32
 	dwPOV          uint32
@@ -75,17 +70,6 @@ var (
 	joyGetPosEx   = winmmdll.MustFindProc("joyGetPosEx")
 	joyGetDevCaps = winmmdll.MustFindProc("joyGetDevCapsW")
 )
-
-func GetJoyPosEx(id int) JOYINFOEX {
-	var info JOYINFOEX
-	info.dwSize = uint32(unsafe.Sizeof(info))
-	info.dwFlags = JOY_RETURNALL
-
-	ret, _, _ := joyGetPosEx.Call(uintptr(id), uintptr(unsafe.Pointer(&info)))
-	ret = ret
-
-	return info
-}
 
 type JoystickImpl struct {
 	id          int
@@ -110,16 +94,33 @@ func OpenJoystick(id int) (Joystick, error) {
 func (js *JoystickImpl) getJoyCaps() error {
 	var caps JOYCAPS
 	ret, _, _ := joyGetDevCaps.Call(uintptr(js.id), uintptr(unsafe.Pointer(&caps)), unsafe.Sizeof(caps))
-	fmt.Printf(">>>%x<<<<", ret)
 
 	if ret != 0 {
 		return fmt.Errorf("Failed to read Joystick %d", js.id)
+	} else {
+		js.axisCount = int(caps.wNumAxes)
+		js.buttonCount = int(caps.wNumButtons)
+		js.name = windows.UTF16ToString(caps.szPname[:])
+		return nil
 	}
+}
 
-	js.axisCount = int(caps.wNumAxes)
-	js.buttonCount = int(caps.wNumButtons)
+func (js *JoystickImpl) getJoyPosEx() error {
+	var info JOYINFOEX
+	info.dwSize = uint32(unsafe.Sizeof(info))
+	info.dwFlags = JOY_RETURNALL
+	ret, _, _ := joyGetPosEx.Call(uintptr(js.id), uintptr(unsafe.Pointer(&info)))
 
-	return nil
+	if ret != 0 {
+		return fmt.Errorf("Failed to read Joystick %d", js.id)
+	} else {
+		js.state.Buttons = info.dwButtons
+
+		for i, v := range info.dwAxis {
+			js.state.AxisData[i] = int(v)
+		}
+		return nil
+	}
 }
 
 func (js *JoystickImpl) AxisCount() int {
@@ -135,6 +136,7 @@ func (js *JoystickImpl) Name() string {
 }
 
 func (js *JoystickImpl) Read() JoystickInfo {
+	js.getJoyPosEx()
 	return js.state
 }
 
