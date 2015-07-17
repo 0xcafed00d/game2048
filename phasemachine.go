@@ -63,5 +63,5 @@ func (ph *PhaseMachine) TimedProgress() float64 {
 }
 
 func (ph *PhaseMachine) TimedReverseProgress() float64 {
-	return ph.TimedReverseProgress()
+	return ph.timer.GetReverseProgress()
 }
