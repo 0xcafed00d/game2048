@@ -5,10 +5,10 @@ import (
 )
 
 type PhaseMachine struct {
-	current   int
-	counting  int
-	intimed   bool
-	beginTime time.Duration
+	current      int
+	counting     int
+	timerRunning bool
+	timer        CountdownTimer
 }
 
 func (ph *PhaseMachine) Once() bool {
@@ -31,21 +31,37 @@ func (ph *PhaseMachine) Manual() bool {
 }
 
 func (ph *PhaseMachine) Timed(period time.Duration) bool {
-	return false
+	inphase := false
+	if ph.current == ph.counting {
+		inphase = true
+
+		if !ph.timerRunning {
+			ph.timer.Reset(period)
+			ph.timerRunning = true
+		} else {
+			if ph.timer.HasExpired() {
+				ph.Step()
+			}
+		}
+	}
+	ph.counting++
+	return inphase
 }
 
 func (ph *PhaseMachine) Step() {
+	ph.timer.ForceExpire()
 	ph.current++
 }
 
 func (ph *PhaseMachine) Reset() {
+	ph.timer.ForceExpire()
 	ph.current = 0
 }
 
 func (ph *PhaseMachine) TimedProgress() float64 {
-	return 0
+	return ph.timer.GetProgress()
 }
 
 func (ph *PhaseMachine) TimedReverseProgress() float64 {
-	return 1
+	return ph.TimedReverseProgress()
 }

@@ -9,6 +9,12 @@ import (
 
 func main() {
 
+	start := time.Now()
+	for {
+		time.Sleep(time.Second)
+		fmt.Println((time.Now().UnixNano() - start.UnixNano()) / int64(time.Millisecond))
+	}
+
 	js, jserr := OpenJoystick(0)
 
 	if jserr == nil {
