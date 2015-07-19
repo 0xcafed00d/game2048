@@ -71,6 +71,7 @@ func OpenJoystick(id int) (Joystick, error) {
 	js.buttonCount = int(buttCount)
 	js.file = f
 	js.name = string(buffer[:])
+	js.state.AxisData = make([]int, axisCount, axisCount)
 
 	go updateStateFunc(js)
 

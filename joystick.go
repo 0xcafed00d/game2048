@@ -1,12 +1,7 @@
 package main
 
-const (
-	MaxAxisCount   = 8
-	MaxButtonCount = 32
-)
-
 type JoystickInfo struct {
-	AxisData [MaxAxisCount]int
+	AxisData []int
 	Buttons  uint32
 }
 

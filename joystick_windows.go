@@ -101,6 +101,8 @@ func (js *JoystickImpl) getJoyCaps() error {
 		js.axisCount = int(caps.wNumAxes)
 		js.buttonCount = int(caps.wNumButtons)
 		js.name = windows.UTF16ToString(caps.szPname[:])
+		js.state.AxisData = make([]int, caps.wNumAxes, caps.wNumAxes)
+
 		return nil
 	}
 }
