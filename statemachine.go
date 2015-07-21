@@ -15,6 +15,7 @@ type State struct {
 type StateMachine struct {
 	states       map[int]*State
 	currentState *State
+	currentID    int
 	gosubStack   []*State
 }
 

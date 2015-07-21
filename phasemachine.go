@@ -11,6 +11,10 @@ type PhaseMachine struct {
 	timer        CountdownTimer
 }
 
+func (ph *PhaseMachine) Begin() {
+	ph.counting = 0
+}
+
 func (ph *PhaseMachine) Once() bool {
 	inphase := false
 	if ph.current == ph.counting {
