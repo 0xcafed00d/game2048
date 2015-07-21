@@ -7,7 +7,9 @@ import (
 )
 
 func TestPhaseMachine(t *testing.T) {
-	assert.FailFunc = t.Fatalf
+	assert.GetFailFunc = func(t *testing.T) assert.FailFunc {
+		return t.Fatalf
+	}
 
 	pm := PhaseMachine{}
 
