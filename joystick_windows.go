@@ -11,6 +11,7 @@ import (
 const (
 	_MAXPNAMELEN            = 32
 	_MAX_JOYSTICKOEMVXDNAME = 260
+	_MAX_AXIS               = 6
 
 	JOY_RETURNX        = 1
 	JOY_RETURNY        = 2
@@ -57,7 +58,7 @@ type JOYCAPS struct {
 type JOYINFOEX struct {
 	dwSize         uint32
 	dwFlags        uint32
-	dwAxis         [6]uint32
+	dwAxis         [_MAX_AXIS]uint32
 	dwButtons      uint32
 	dwButtonNumber uint32
 	dwPOV          uint32
@@ -71,12 +72,21 @@ var (
 	joyGetDevCaps = winmmdll.MustFindProc("joyGetDevCapsW")
 )
 
+type axisLimit struct {
+	min, max uint32
+}
+
 type JoystickImpl struct {
 	id          int
 	axisCount   int
 	buttonCount int
 	name        string
 	state       JoystickInfo
+	axisLimits  []axisLimit
+}
+
+func mapValue(val, srcMin, srcMax, dstMin, dstMax int64) int64 {
+	return (val-srcMin)*(dstMax-dstMin)/(srcMax-srcMin) + dstMin
 }
 
 func OpenJoystick(id int) (Joystick, error) {
@@ -103,6 +113,15 @@ func (js *JoystickImpl) getJoyCaps() error {
 		js.name = windows.UTF16ToString(caps.szPname[:])
 		js.state.AxisData = make([]int, caps.wNumAxes, caps.wNumAxes)
 
+		js.axisLimits = []axisLimit{
+			{caps.wXmin, caps.wXmax},
+			{caps.wYmin, caps.wYmax},
+			{caps.wZmin, caps.wZmax},
+			{caps.wRmin, caps.wRmax},
+			{caps.wUmin, caps.wUmax},
+			{caps.wVmin, caps.wVmax},
+		}
+
 		return nil
 	}
 }
@@ -117,9 +136,9 @@ func (js *JoystickImpl) getJoyPosEx() error {
 		return fmt.Errorf("Failed to read Joystick %d", js.id)
 	} else {
 		js.state.Buttons = info.dwButtons
-
-		for i, v := range info.dwAxis {
-			js.state.AxisData[i] = int(v)
+		for i, _ := range js.state.AxisData {
+			js.state.AxisData[i] = int(mapValue(int64(info.dwAxis[i]),
+				int64(js.axisLimits[i].min), int64(js.axisLimits[i].max), -32767, 32768))
 		}
 		return nil
 	}
