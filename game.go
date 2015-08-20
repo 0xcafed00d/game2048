@@ -62,10 +62,10 @@ func main() {
 			dy = -dy
 		}
 
-		DrawBox(gc.BackBuffer, rect.XYWH(0, 10, 10, 6), 0)
-		DrawBox(gc.BackBuffer, rect.XYWH(10, 10, 10, 6), 1)
-		DrawBox(gc.BackBuffer, rect.XYWH(20, 10, 10, 6), 2)
-		DrawBox(gc.BackBuffer, rect.XYWH(30, 10, 10, 6), 3)
+		DrawBox(gc.BackBuffer, rect.XYWH(0, 10, 9, 5), 0)
+		DrawBox(gc.BackBuffer, rect.XYWH(10, 10, 9, 5), 1)
+		DrawBox(gc.BackBuffer, rect.XYWH(20, 10, 9, 5), 2)
+		DrawBox(gc.BackBuffer, rect.XYWH(30, 10, 9, 5), 3)
 		return nil
 	}
 
