@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/nsf/termbox-go"
-	"github.com/simulatedsimian/game/glib"
+	"github.com/simulatedsimian/game2048/glib"
 	"github.com/simulatedsimian/rect"
 )
 
