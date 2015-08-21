@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/nsf/termbox-go"
+	"github.com/simulatedsimian/game/glib"
 	"github.com/simulatedsimian/rect"
 )
 
@@ -12,7 +13,7 @@ var drawingChars = [][]rune{
 	[]rune("▛▜▙▟▀▄▌▐"),
 }
 
-func DrawBox(buffer Buffer, area rect.Rectangle, mode int) {
+func DrawBox(buffer glib.Buffer, area rect.Rectangle, mode int) {
 	buffer.SetCell(area.Min.X, area.Min.Y, drawingChars[mode][0],
 		termbox.ColorDefault, termbox.ColorDefault)
 	buffer.SetCell(area.Max.X-1, area.Min.Y, drawingChars[mode][1],

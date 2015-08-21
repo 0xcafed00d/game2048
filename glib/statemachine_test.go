@@ -1,4 +1,4 @@
-package main
+package glib
 
 import (
 	"github.com/simulatedsimian/assert"
