@@ -10,6 +10,7 @@ type Cell struct {
 	locked bool
 }
 
+// game board [0][0] is top left
 type GameBoard [BoardSizeX][BoardSizeY]Cell
 
 type Direction int
@@ -40,18 +41,22 @@ type GameState struct {
 	PrevBoard GameBoard
 }
 
-func (gb *GameBoard) RelativePos(x, y int, dir Direction) (newx, newy int, ok bool) {
+func RelativePos(x, y int, dir Direction) (newx, newy int, ok bool) {
 	dx, dy := DxDy(dir)
 	newx = x + dx
 	newy = y + dy
 	ok = newx >= 0 && newy >= 0 && newx < BoardSizeX && newy < BoardSizeY
+
+	if !ok {
+		newx, newy = x, y
+	}
 
 	return
 }
 
 func (gb *GameBoard) MoveCell(x, y int, dir Direction) {
 	if gb.CanMove(x, y, dir) {
-		dx, dy, _ := gb.RelativePos(x, y, dir)
+		dx, dy, _ := RelativePos(x, y, dir)
 		if gb[x+dx][y+dy].val == 0 {
 			gb[x+dx][y+dy] = gb[x][y]
 		} else {
@@ -63,10 +68,10 @@ func (gb *GameBoard) MoveCell(x, y int, dir Direction) {
 }
 
 func (gb *GameBoard) CanMove(x, y int, dir Direction) bool {
-	dx, dy, onBoard := gb.RelativePos(x, y, dir)
+	tox, toy, onBoard := RelativePos(x, y, dir)
 
 	fromCell := gb[x][y]
-	toCell := gb[x+dx][y+dy]
+	toCell := gb[tox][toy]
 
 	// can move if new location is on the board & not locked and destinaltion cell is empty
 	// or destination is same value as source
