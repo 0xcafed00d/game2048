@@ -16,6 +16,16 @@ type Cell struct {
 // game board [0][0] is top left
 type GameBoard [BoardSize][BoardSize]Cell
 
+func printBoard(gb *GameBoard) {
+	for y := 0; y < BoardSize; y++ {
+		for x := 0; x < BoardSize; x++ {
+			fmt.Print(gb[x][y])
+		}
+		fmt.Println()
+	}
+	return
+}
+
 type Direction int
 
 const (
@@ -62,7 +72,7 @@ func (gb *GameBoard) MoveCell(x, y int, dir Direction) (moved bool, score int) {
 	if gb.CanMove(x, y, dir) {
 		newx, newy, _ := RelativePos(x, y, dir)
 		if gb[newx][newy].val == 0 {
-			gb[newy][newy] = gb[x][y]
+			gb[newx][newy] = gb[x][y]
 		} else {
 			gb[newx][newy].val += gb[x][y].val
 			gb[newx][newy].locked = true
@@ -115,11 +125,8 @@ func (gb *GameBoard) SingleStep(dir Direction) (moves []Move, score int) {
 
 	doMove := func(x, y int, dir Direction) {
 		moved, sc := gb.MoveCell(x, y, dir)
-		fmt.Println(x, y, moved, sc)
-
 		score += sc
 		if moved {
-			_ = "breakpoint"
 			moves = append(moves, Move{x, y})
 		}
 	}

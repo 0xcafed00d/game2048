@@ -1,6 +1,7 @@
 package main
 
 import (
+	//	"fmt"
 	"github.com/simulatedsimian/assert"
 	"testing"
 )
@@ -64,6 +65,13 @@ func TestMove(t *testing.T) {
 
 	assert.Equal(t, pack(gb.MoveCell(1, 1, Up)), pack(false, 0))
 
+	gb[3][3] = _2
+	assert.Equal(t, pack(gb.MoveCell(3, 3, Left)), pack(true, 0))
+	assert.Equal(t, gb[3][3], _0)
+	assert.Equal(t, gb[2][3], _2)
+
+	gb.Reset()
+
 	gb[0][0] = _2
 	gb[1][0] = _2
 
@@ -103,4 +111,10 @@ func TestStep(t *testing.T) {
 	assert.Equal(t, gb[1][0], _0)
 
 	assert.Equal(t, pack(gb.SingleStep(Left)), pack([]Move{{2, 0}, {3, 0}, {3, 3}}, 0))
+
+	assert.Equal(t, gb, makeBoard(
+		_0, _2, _2, _0,
+		_0, _0, _0, _0,
+		_0, _0, _0, _0,
+		_0, _0, _4, _0))
 }
