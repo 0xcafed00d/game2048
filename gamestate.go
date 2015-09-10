@@ -118,11 +118,6 @@ type Move struct {
 
 func (gb *GameBoard) SingleStep(dir Direction) (moves []Move, score int) {
 
-	scanStart, scanStop, scanStep := 0, BoardSize-1, 1
-	if dir == Right || dir == Down {
-		scanStart, scanStop, scanStep = BoardSize-1, 0, -1
-	}
-
 	doMove := func(x, y int, dir Direction) {
 		moved, sc := gb.MoveCell(x, y, dir)
 		score += sc
@@ -131,17 +126,33 @@ func (gb *GameBoard) SingleStep(dir Direction) (moves []Move, score int) {
 		}
 	}
 
-	if dir == Left || dir == Right {
+	if dir == Left {
 		for y := 0; y < BoardSize; y++ {
-			for x := scanStart; x <= scanStop; x += scanStep {
+			for x := 0; x < BoardSize; x++ {
 				doMove(x, y, dir)
 			}
 		}
 	}
 
-	if dir == Up || dir == Down {
+	if dir == Right {
+		for y := 0; y < BoardSize; y++ {
+			for x := BoardSize - 1; x >= 0; x-- {
+				doMove(x, y, dir)
+			}
+		}
+	}
+
+	if dir == Up {
 		for x := 0; x < BoardSize; x++ {
-			for y := scanStart; y <= scanStop; y += scanStep {
+			for y := 0; y < BoardSize; y++ {
+				doMove(x, y, dir)
+			}
+		}
+	}
+
+	if dir == Down {
+		for x := 0; x < BoardSize; x++ {
+			for y := BoardSize - 1; y >= 0; y-- {
 				doMove(x, y, dir)
 			}
 		}

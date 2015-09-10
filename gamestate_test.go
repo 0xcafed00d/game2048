@@ -85,7 +85,7 @@ func TestMove(t *testing.T) {
 }
 
 // need this otherwise initialising gameboard directly
-// will tanspose axis
+// will transpose axis
 func makeBoard(cells ...Cell) (gb GameBoard) {
 	i := 0
 	for y := 0; y < BoardSize; y++ {
@@ -105,8 +105,6 @@ func TestStep(t *testing.T) {
 		_0, _0, _0, _0,
 		_0, _0, _0, _4)
 
-	_ = "breakpoint"
-
 	assert.Equal(t, gb[2][0], _2)
 	assert.Equal(t, gb[1][0], _0)
 
@@ -117,4 +115,89 @@ func TestStep(t *testing.T) {
 		_0, _0, _0, _0,
 		_0, _0, _0, _0,
 		_0, _0, _4, _0))
+
+	assert.Equal(t, pack(gb.SingleStep(Left)), pack([]Move{{1, 0}, {2, 0}, {2, 3}}, 0))
+
+	assert.Equal(t, gb, makeBoard(
+		_2, _2, _0, _0,
+		_0, _0, _0, _0,
+		_0, _0, _0, _0,
+		_0, _4, _0, _0))
+
+	assert.Equal(t, pack(gb.SingleStep(Left)), pack([]Move{{1, 0}, {1, 3}}, 4))
+
+	assert.Equal(t, gb, makeBoard(
+		_4l, _0, _0, _0,
+		_0, _0, _0, _0,
+		_0, _0, _0, _0,
+		_4, _0, _0, _0))
+
+	gb.ClearLocks()
+
+	assert.Equal(t, gb, makeBoard(
+		_4, _0, _0, _0,
+		_0, _0, _0, _0,
+		_0, _0, _0, _0,
+		_4, _0, _0, _0))
+
+	assert.Equal(t, pack(gb.SingleStep(Down)), pack([]Move{{0, 0}}, 0))
+
+	assert.Equal(t, gb, makeBoard(
+		_0, _0, _0, _0,
+		_4, _0, _0, _0,
+		_0, _0, _0, _0,
+		_4, _0, _0, _0))
+
+	assert.Equal(t, pack(gb.SingleStep(Down)), pack([]Move{{0, 1}}, 0))
+
+	assert.Equal(t, gb, makeBoard(
+		_0, _0, _0, _0,
+		_0, _0, _0, _0,
+		_4, _0, _0, _0,
+		_4, _0, _0, _0))
+
+	assert.Equal(t, pack(gb.SingleStep(Down)), pack([]Move{{0, 2}}, 8))
+
+	assert.Equal(t, gb, makeBoard(
+		_0, _0, _0, _0,
+		_0, _0, _0, _0,
+		_0, _0, _0, _0,
+		_8l, _0, _0, _0))
+}
+
+func TestStep2(t *testing.T) {
+
+	gb := makeBoard(
+		_0, _0, _0, _0,
+		_0, _2, _2, _0,
+		_0, _2, _2, _0,
+		_0, _0, _0, _0)
+
+	assert.Equal(t, pack(gb.SingleStep(Up)),
+		pack([]Move{{1, 1}, {1, 2}, {2, 1}, {2, 2}}, 0))
+
+	assert.Equal(t, gb, makeBoard(
+		_0, _2, _2, _0,
+		_0, _2, _2, _0,
+		_0, _0, _0, _0,
+		_0, _0, _0, _0))
+
+	assert.Equal(t, pack(gb.SingleStep(Right)),
+		pack([]Move{{2, 0}, {1, 0}, {2, 1}, {1, 1}}, 0))
+
+	assert.Equal(t, gb, makeBoard(
+		_0, _0, _2, _2,
+		_0, _0, _2, _2,
+		_0, _0, _0, _0,
+		_0, _0, _0, _0))
+
+	assert.Equal(t, pack(gb.SingleStep(Right)),
+		pack([]Move{{2, 0}, {2, 1}}, 8))
+
+	assert.Equal(t, gb, makeBoard(
+		_0, _0, _0, _4l,
+		_0, _0, _0, _4l,
+		_0, _0, _0, _0,
+		_0, _0, _0, _0))
+
 }
