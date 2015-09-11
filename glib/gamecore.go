@@ -1,9 +1,8 @@
 package glib
 
 import (
-	"time"
-
 	"github.com/nsf/termbox-go"
+	"time"
 )
 
 type OnInitFunc func(gc *GameCore) error
@@ -15,6 +14,7 @@ type GameCore struct {
 	OnTick     OnTickFunc
 	OnEvent    OnEventFunc
 	DoQuit     bool
+	TickTime   time.Duration
 	Ticker     *time.Ticker
 	BackBuffer TermboxBuffer
 }
@@ -27,7 +27,7 @@ func (gc *GameCore) Run() error {
 	defer termbox.Close()
 
 	if gc.OnInit != nil {
-		gc.OnInit(gc)
+		err = gc.OnInit(gc)
 		if err != nil {
 			return err
 		}
@@ -40,13 +40,13 @@ func (gc *GameCore) Run() error {
 		}
 	}()
 
-	gc.Ticker = time.NewTicker(time.Millisecond * 40)
+	gc.Ticker = time.NewTicker(gc.TickTime)
 
-	for !gc.DoQuit {
+	for !gc.DoQuit && err == nil {
 		select {
 		case ev := <-eventQueue:
 			if gc.OnEvent != nil {
-				gc.OnEvent(gc, &ev)
+				err = gc.OnEvent(gc, &ev)
 			}
 			if ev.Type == termbox.EventResize {
 				termbox.Flush()
@@ -54,7 +54,7 @@ func (gc *GameCore) Run() error {
 
 		case <-gc.Ticker.C:
 			if gc.OnTick != nil {
-				gc.OnTick(gc)
+				err = gc.OnTick(gc)
 				termbox.Flush()
 			}
 		}
