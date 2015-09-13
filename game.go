@@ -12,7 +12,7 @@ import (
 func main() {
 	gc := glib.GameCore{}
 
-	state := GameState{}
+	state := MakeGameState()
 
 	gc.OnInit = func(gc *glib.GameCore) error {
 		state.NewGame()

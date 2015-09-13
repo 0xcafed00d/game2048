@@ -79,3 +79,10 @@ func (sm *StateMachine) Return() {
 		panic("Empty Gosub Stack")
 	}
 }
+
+func (sm *StateMachine) CurrentId() (int, bool) {
+	if sm.currentState == nil {
+		return 0, false
+	}
+	return sm.currentID, true
+}
