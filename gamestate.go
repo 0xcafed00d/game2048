@@ -1,15 +1,9 @@
 package main
 
 import (
+	//"fmt"
 	"github.com/simulatedsimian/game2048/glib"
 )
-
-type BoardDrawer interface {
-	DrawScores(scr, hi int)
-	DrawBoardNow(gb *GameBoard)
-	StartSlideTiles(tiles []Move, dir Direction)
-	DoneSlideTiles() bool
-}
 
 type GameInfo struct {
 	Score   int
@@ -38,8 +32,6 @@ func MakeGameState() *GameState {
 	gs.AddState(StateGameOver, glib.State{})
 	gs.AddState(StateReadyForMove, glib.State{})
 	gs.AddState(StateMoveInProgress, glib.State{})
-
-	gs.NewGame()
 
 	return &gs
 }

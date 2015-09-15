@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/nsf/termbox-go"
 	"github.com/simulatedsimian/game2048/glib"
@@ -11,8 +12,10 @@ import (
 
 func main() {
 	gc := glib.GameCore{}
+	gc.TickTime = 50 * time.Millisecond
 
 	state := MakeGameState()
+	state.Drawer = &SimpleDrawer{}
 
 	gc.OnInit = func(gc *glib.GameCore) error {
 		state.NewGame()
