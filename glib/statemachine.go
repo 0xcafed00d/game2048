@@ -19,11 +19,10 @@ type StateMachine struct {
 	gosubStack   []*State
 }
 
-func MakeStateMachine() StateMachine {
-	return StateMachine{states: make(map[int]*State)}
-}
-
 func (sm *StateMachine) AddState(id int, si State) {
+	if sm.states == nil {
+		sm.states = make(map[int]*State)
+	}
 	sm.states[id] = &si
 }
 
