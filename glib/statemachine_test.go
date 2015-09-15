@@ -8,17 +8,17 @@ import (
 func TestPanics(t *testing.T) {
 
 	assert.MustPanic(t, func(t *testing.T) {
-		s := MakeStateMachine()
+		s := StateMachine{}
 		s.Goto(5)
 	})
 
 	assert.MustPanic(t, func(t *testing.T) {
-		s := MakeStateMachine()
+		s := StateMachine{}
 		s.Return()
 	})
 
 	assert.MustPanic(t, func(t *testing.T) {
-		s := MakeStateMachine()
+		s := StateMachine{}
 		s.Gosub(5)
 	})
 }
@@ -32,7 +32,7 @@ func makeStateFunction(name string, result *[]string) StateFunc {
 func TestStates(t *testing.T) {
 	var result []string
 
-	sm := MakeStateMachine()
+	sm := StateMachine{}
 
 	sm.AddState(1, State{
 		Enter:  makeStateFunction("s1Enter", &result),
