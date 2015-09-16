@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 const (
@@ -157,5 +158,30 @@ func (gb *GameBoard) SingleStep(dir Direction) (moves []Move, score int) {
 }
 
 func (gb *GameBoard) FindFreeCell() (x int, y int, ok bool) {
-	return 0, 0, true
+	emptyCount := 0
+
+	for y := 0; y < BoardSize; y++ {
+		for x := 0; x < BoardSize; x++ {
+			if gb[x][y].val == 0 {
+				emptyCount++
+			}
+		}
+	}
+
+	if emptyCount > 0 {
+		emptyIndex := rand.Intn(emptyCount)
+
+		for y := 0; y < BoardSize; y++ {
+			for x := 0; x < BoardSize; x++ {
+				if gb[x][y].val == 0 {
+					if emptyIndex == 0 {
+						return x, y, true
+					}
+					emptyIndex--
+				}
+			}
+		}
+	}
+
+	return 0, 0, false
 }
