@@ -90,6 +90,7 @@ func (gs *GameState) ReadyForMove() bool {
 
 func (gs *GameState) DoMove(dir Direction) {
 	if gs.ReadyForMove() {
+
 		gs.Previous = gs.Current
 		gs.Move = dir
 		gs.Goto(StateMoveInProgress)

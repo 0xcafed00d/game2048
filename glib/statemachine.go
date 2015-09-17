@@ -10,16 +10,17 @@ type State struct {
 	Enter  StateFunc
 	Action StateFunc
 	Exit   StateFunc
+	id     int
 }
 
 type StateMachine struct {
 	states       map[int]*State
 	currentState *State
-	currentID    int
 	gosubStack   []*State
 }
 
 func (sm *StateMachine) AddState(id int, si State) {
+	si.id = id
 	if sm.states == nil {
 		sm.states = make(map[int]*State)
 	}
@@ -83,5 +84,5 @@ func (sm *StateMachine) CurrentId() (int, bool) {
 	if sm.currentState == nil {
 		return 0, false
 	}
-	return sm.currentID, true
+	return sm.currentState.id, true
 }

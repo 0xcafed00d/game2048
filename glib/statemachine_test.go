@@ -5,6 +5,11 @@ import (
 	"testing"
 )
 
+// pack a number of values into a slice containing those values
+func pack(vals ...interface{}) []interface{} {
+	return vals
+}
+
 func TestPanics(t *testing.T) {
 
 	assert.MustPanic(t, func(t *testing.T) {
@@ -50,21 +55,30 @@ func TestStates(t *testing.T) {
 
 	sm.DoAction()
 	sm.Goto(1)
+	assert.Equal(t, pack(sm.CurrentId()), pack(1, true))
 	sm.DoAction()
 	sm.Goto(2)
+	assert.Equal(t, pack(sm.CurrentId()), pack(2, true))
 	sm.DoAction()
 	sm.Goto(3)
+	assert.Equal(t, pack(sm.CurrentId()), pack(3, true))
 	sm.DoAction()
 	sm.Goto(1)
+	assert.Equal(t, pack(sm.CurrentId()), pack(1, true))
 	sm.DoAction()
 	sm.Gosub(2)
+	assert.Equal(t, pack(sm.CurrentId()), pack(2, true))
 	sm.DoAction()
 	sm.Gosub(1)
+	assert.Equal(t, pack(sm.CurrentId()), pack(1, true))
 	sm.DoAction()
 	sm.Return()
+	assert.Equal(t, pack(sm.CurrentId()), pack(2, true))
 	sm.Return()
+	assert.Equal(t, pack(sm.CurrentId()), pack(1, true))
 	sm.DoAction()
 	sm.Goto(3)
+	assert.Equal(t, pack(sm.CurrentId()), pack(3, true))
 
 	expect := []string{
 		"s1Enter",
