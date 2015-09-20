@@ -19,21 +19,23 @@ type Buffer interface {
 	Size() (int, int)
 }
 
-type TermboxBuffer struct {
+type TermboxBufferType struct {
 }
 
-func (b TermboxBuffer) SetCell(x, y int, ch rune, fg, bg termbox.Attribute) {
+var TermboxBuffer TermboxBufferType
+
+func (b TermboxBufferType) SetCell(x, y int, ch rune, fg, bg termbox.Attribute) {
 	termbox.SetCell(x, y, ch, fg, bg)
 }
 
-func (b TermboxBuffer) GetCell(x, y int) (rune, termbox.Attribute, termbox.Attribute) {
+func (b TermboxBufferType) GetCell(x, y int) (rune, termbox.Attribute, termbox.Attribute) {
 	cells := termbox.CellBuffer()
 	w, _ := termbox.Size()
 	cell := &cells[y*w+x]
 	return cell.Ch, cell.Fg, cell.Bg
 }
 
-func (b TermboxBuffer) Size() (int, int) {
+func (b TermboxBufferType) Size() (int, int) {
 	return termbox.Size()
 }
 

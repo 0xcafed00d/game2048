@@ -16,7 +16,7 @@ type GameCore struct {
 	DoQuit     bool
 	TickTime   time.Duration
 	Ticker     *time.Ticker
-	BackBuffer TermboxBuffer
+	BackBuffer TermboxBufferType
 }
 
 func (gc *GameCore) Run() error {

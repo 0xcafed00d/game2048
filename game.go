@@ -15,7 +15,10 @@ func main() {
 	gc.TickTime = 50 * time.Millisecond
 
 	state := MakeGameState()
-	state.Drawer = &SimpleDrawer{}
+	state.Drawer = &AnimatedDrawer{
+		TileW: 10,
+		TileH: 5,
+	}
 
 	gc.OnInit = func(gc *glib.GameCore) error {
 		state.NewGame()
