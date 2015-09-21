@@ -17,6 +17,7 @@ type Buffer interface {
 	SetCell(x, y int, ch rune, fg, bg termbox.Attribute)
 	GetCell(x, y int) (rune, termbox.Attribute, termbox.Attribute)
 	Size() (int, int)
+	CellBuffer() []termbox.Cell
 }
 
 type TermboxBufferType struct {
@@ -37,6 +38,10 @@ func (b TermboxBufferType) GetCell(x, y int) (rune, termbox.Attribute, termbox.A
 
 func (b TermboxBufferType) Size() (int, int) {
 	return termbox.Size()
+}
+
+func (b TermboxBufferType) CellBuffer() []termbox.Cell {
+	return termbox.CellBuffer()
 }
 
 type MemBuffer struct {
@@ -65,6 +70,10 @@ func (b *MemBuffer) GetCell(x, y int) (rune, termbox.Attribute, termbox.Attribut
 
 func (b *MemBuffer) Size() (int, int) {
 	return b.w, b.h
+}
+
+func (b *MemBuffer) CellBuffer() []termbox.Cell {
+	return b.cells
 }
 
 const (
