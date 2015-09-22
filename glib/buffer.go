@@ -84,6 +84,11 @@ const (
 	ATTRIBS = FG | BG
 )
 
+func GetBufferRow(src Buffer, row int) []termbox.Cell {
+	w, _ := src.Size()
+	return src.CellBuffer()[row*w : row*w+w]
+}
+
 func FillArea(dst Buffer, area rect.Rectangle, ch rune, fg, bg termbox.Attribute, filltype int) {
 	area, ok := rect.Intersection(rect.WH(dst.Size()), area)
 
